@@ -29,7 +29,7 @@ export class Main {
     );
   }
 
-  forOrganizationManager(organization_id: string) {
+  forOrganizationManager(organization_id: string, user_permissions: string[]) {
     return Prisma.defineExtension(prisma =>
       prisma.$extends({
         query: {
@@ -37,6 +37,9 @@ export class Main {
             async $allOperations({ args, query }) {
               const [, result] = await prisma.$transaction([
                 prisma.$executeRaw`SELECT set_config('app.current_organization_id', ${organization_id}, TRUE)`,
+                prisma.$executeRaw`SELECT set_config('app.current_user_permissions', ${user_permissions.join(
+                  ','
+                )}, TRUE)`,
                 query(args),
               ]);
               return result;
@@ -52,7 +55,7 @@ export class Main {
       await this.bypassPrisma.organization.findFirstOrThrow();
 
     const organizationPrisma = prisma.$extends(
-      this.forOrganizationManager(organization.id)
+      this.forOrganizationManager(organization.id, ['VIEWER'])
     );
 
     const organization_manager =
@@ -81,7 +84,9 @@ export class Main {
       });
 
     const organizationPrisma = prisma.$extends(
-      this.forOrganizationManager(organization_manager.organization_id)
+      this.forOrganizationManager(organization_manager.organization_id, [
+        'VIEWER',
+      ])
     );
 
     const organization_to_be_updated =
@@ -117,7 +122,9 @@ export class Main {
       });
 
     const organizationPrisma = prisma.$extends(
-      this.forOrganizationManager(organization_manager.organization_id)
+      this.forOrganizationManager(organization_manager.organization_id, [
+        'VIEWER',
+      ])
     );
 
     return organizationPrisma.organization.update({
@@ -143,7 +150,9 @@ export class Main {
       });
 
     const organizationPrisma = prisma.$extends(
-      this.forOrganizationManager(organization_manager.organization_id)
+      this.forOrganizationManager(organization_manager.organization_id, [
+        'VIEWER',
+      ])
     );
 
     const event = await this.bypassPrisma.event.findFirstOrThrow({
@@ -179,7 +188,9 @@ export class Main {
       });
 
     const organizationPrisma = prisma.$extends(
-      this.forOrganizationManager(organization_manager.organization_id)
+      this.forOrganizationManager(organization_manager.organization_id, [
+        'VIEWER',
+      ])
     );
 
     const event = await this.bypassPrisma.event.findFirstOrThrow({
