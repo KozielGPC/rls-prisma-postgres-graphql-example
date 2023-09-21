@@ -73,7 +73,7 @@ yarn install
 Run the following command to start a new Postgres database in a Docker container:
 
 ```sh
-docker compose up -d
+docker-compose up -d
 ```
 
 ### 3. Run migrations
