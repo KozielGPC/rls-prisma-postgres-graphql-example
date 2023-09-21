@@ -1,11 +1,11 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient({
-//   log: ['query', 'info', 'warn', 'error'],
+  //   log: ['query', 'info', 'warn', 'error'],
 });
 
 const superPrisma = new PrismaClient({
-//   log: ['query', 'info', 'warn', 'error'],
+  //   log: ['query', 'info', 'warn', 'error'],
 });
 
 export class Main {
@@ -105,7 +105,7 @@ export class Main {
       await this.bypassPrisma.organizationManager.findFirstOrThrow({
         where: {
           organization_id: {
-              equals: organization.id,
+            equals: organization.id,
           },
         },
       });
@@ -120,6 +120,74 @@ export class Main {
       },
       data: {
         description: 'New Description',
+      },
+    });
+  }
+
+  async denyUpdateEventFromOrganizationThatIsNotManager() {
+    const organization =
+      await this.bypassPrisma.organization.findFirstOrThrow();
+
+    const organization_manager =
+      await this.bypassPrisma.organizationManager.findFirstOrThrow({
+        where: {
+          organization_id: {
+            not: {
+              equals: organization.id,
+            },
+          },
+        },
+      });
+
+    const organizationPrisma = prisma.$extends(
+      this.forOrganizationManager(organization_manager.organization_id)
+    );
+
+    const event = await this.bypassPrisma.event.findFirstOrThrow({
+      where: {
+        organization_id: organization.id,
+      },
+    });
+
+    return organizationPrisma.event.update({
+      where: {
+        id: event.id,
+      },
+      data: {
+        published: false,
+      },
+    });
+  }
+
+  async allowUpdateEventFromOrganizationThatIsNotManager() {
+    const organization =
+      await this.bypassPrisma.organization.findFirstOrThrow();
+
+    const organization_manager =
+      await this.bypassPrisma.organizationManager.findFirstOrThrow({
+        where: {
+          organization_id: {
+            equals: organization.id,
+          },
+        },
+      });
+
+    const organizationPrisma = prisma.$extends(
+      this.forOrganizationManager(organization_manager.organization_id)
+    );
+    
+    const event = await this.bypassPrisma.event.findFirstOrThrow({
+      where: {
+        organization_id: organization.id,
+      },
+    });
+
+    return organizationPrisma.event.update({
+      where: {
+        id: event.id,
+      },
+      data: {
+        published: false,
       },
     });
   }

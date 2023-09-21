@@ -21,8 +21,19 @@ describe('Tests', () => {
     ).rejects.toThrow();
   });
 
-  it('should allow to update organization description due to user is not manager', async () => {
+  it('should allow to update organization description due to user is manager', async () => {
     const updated_organization = await main.allowUpdateOrganizationThatIsNotManager();
     expect(updated_organization).toHaveProperty('description', 'New Description');
+  });
+
+  it('should throw error to update event from organization that user is not manager', async () => {
+    await expect(
+      main.denyUpdateEventFromOrganizationThatIsNotManager()
+    ).rejects.toThrow();
+  });
+
+  it('should allow to update event that user is manager', async () => {
+    const updated_event = await main.allowUpdateEventFromOrganizationThatIsNotManager();
+    expect(updated_event).toHaveProperty('published', false);
   });
 });
