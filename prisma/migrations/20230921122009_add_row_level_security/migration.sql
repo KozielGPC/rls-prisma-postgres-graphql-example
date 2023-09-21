@@ -5,7 +5,6 @@ ALTER TABLE "organization_managers" ENABLE ROW LEVEL SECURITY;
 -- Force Row Level Security for table owners
 ALTER TABLE "organizations" FORCE ROW LEVEL SECURITY;
 ALTER TABLE "organization_managers" FORCE ROW LEVEL SECURITY;
-ALTER TABLE "User" FORCE ROW LEVEL SECURITY;
 
 -- Create row security policies
 CREATE POLICY tenant_isolation_policy ON "organizations" USING ("id" = current_setting('app.current_organization_id', TRUE)::uuid);
