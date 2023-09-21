@@ -1,0 +1,39 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Organization {
+  id String @id @default(uuid()) @db.Uuid
+  name String @db.VarChar(255)
+
+  short_name String? @db.VarChar(100)
+
+  description String? @db.Text
+
+  organization_managers OrganizationManager[]
+
+  @@map("organizations")
+}
+
+model OrganizationManager {
+  reference_user_id String @db.Uuid
+  organization_id String @db.Uuid @default(dbgenerated("(current_setting('app.current_organization_id'::text))::uuid"))
+  organization Organization @relation(fields: [organization_id], references: [id])
+
+  @@id([reference_user_id, organization_id])
+  @@map("organization_managers")
+}
+
+model User {
+  id        String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email     String @unique
+}
