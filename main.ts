@@ -69,16 +69,13 @@ export class Main {
   }
 
   async denyUpdateOrganizationThatIsNotManager() {
-    const organization =
-      await this.bypassPrisma.organization.findFirstOrThrow();
+    const user = await this.bypassPrisma.user.findFirstOrThrow();
 
     const organization_manager =
       await this.bypassPrisma.organizationManager.findFirstOrThrow({
         where: {
-          organization_id: {
-            not: {
-              equals: organization.id,
-            },
+          reference_user_id: {
+            equals: user.id,
           },
         },
       });
@@ -87,9 +84,19 @@ export class Main {
       this.forOrganizationManager(organization_manager.organization_id)
     );
 
+    const organization_to_be_updated =
+      await this.bypassPrisma.organization.findFirstOrThrow({
+        where: {
+          id: {
+            not: {
+              equals: organization_manager.organization_id,
+            },
+          },
+        },
+      });
     return organizationPrisma.organization.update({
       where: {
-        id: organization.id,
+        id: organization_to_be_updated.id,
       },
       data: {
         description: 'New Description',
@@ -98,14 +105,13 @@ export class Main {
   }
 
   async allowUpdateOrganizationThatIsNotManager() {
-    const organization =
-      await this.bypassPrisma.organization.findFirstOrThrow();
+    const user = await this.bypassPrisma.user.findFirstOrThrow();
 
     const organization_manager =
       await this.bypassPrisma.organizationManager.findFirstOrThrow({
         where: {
-          organization_id: {
-            equals: organization.id,
+          reference_user_id: {
+            equals: user.id,
           },
         },
       });
@@ -116,7 +122,7 @@ export class Main {
 
     return organizationPrisma.organization.update({
       where: {
-        id: organization.id,
+        id: organization_manager.organization_id,
       },
       data: {
         description: 'New Description',
@@ -125,16 +131,13 @@ export class Main {
   }
 
   async denyUpdateEventFromOrganizationThatIsNotManager() {
-    const organization =
-      await this.bypassPrisma.organization.findFirstOrThrow();
+    const user = await this.bypassPrisma.organization.findFirstOrThrow();
 
     const organization_manager =
       await this.bypassPrisma.organizationManager.findFirstOrThrow({
         where: {
-          organization_id: {
-            not: {
-              equals: organization.id,
-            },
+          reference_user_id: {
+            equals: user.id,
           },
         },
       });
@@ -145,7 +148,11 @@ export class Main {
 
     const event = await this.bypassPrisma.event.findFirstOrThrow({
       where: {
-        organization_id: organization.id,
+        organization_id: {
+          not: {
+            equals: organization_manager.organization_id,
+          },
+        },
       },
     });
 
@@ -160,14 +167,13 @@ export class Main {
   }
 
   async allowUpdateEventFromOrganizationThatIsNotManager() {
-    const organization =
-      await this.bypassPrisma.organization.findFirstOrThrow();
+    const user = await this.bypassPrisma.user.findFirstOrThrow();
 
     const organization_manager =
       await this.bypassPrisma.organizationManager.findFirstOrThrow({
         where: {
-          organization_id: {
-            equals: organization.id,
+          reference_user_id: {
+            equals: user.id,
           },
         },
       });
@@ -175,10 +181,10 @@ export class Main {
     const organizationPrisma = prisma.$extends(
       this.forOrganizationManager(organization_manager.organization_id)
     );
-    
+
     const event = await this.bypassPrisma.event.findFirstOrThrow({
       where: {
-        organization_id: organization.id,
+        organization_id: organization_manager.organization_id,
       },
     });
 
