@@ -99,3 +99,6 @@ To run the `tests.spec.ts` file, run the following command:
 ```sh
 yarn jest
 ```
+
+## Notes
+Using the `Prisma Extensions` implementation, there is a bug where you run a query with the RLS and then run a second with ByPass, it throws an error. It is better descripted in this [issue](https://github.com/prisma/prisma/issues/20407), and the solution is to connect with two different prisma clients, but it connects using 26 connections from the connection pool (13 for each client). If you wanna see the conenction info, uncomment the lines of logs in the PrismaClient instances at `main.ts`
