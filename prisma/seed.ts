@@ -4,6 +4,16 @@ import { Prisma, PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
+  const roles = [
+    {
+      id: 'ADMIN',
+      name: 'Admin',
+    },
+    {
+      id: 'VIEWER',
+      name: 'Viewer',
+    },
+  ];
   // Create 100 organizations
   const data = Array.from({ length: 100 }, () => {
     // Create organization
@@ -18,10 +28,20 @@ async function main() {
 
     // Create user manager
     const user_id = faker.string.uuid();
-    const user: Prisma.UserCreateInput = {
+    const user: Prisma.UserUncheckedCreateInput = {
       id: user_id,
       email: faker.internet.email(),
+      user_role_id: roles[0].id,
     };
+
+    // Create user viewer
+    const user_viewer_id = faker.string.uuid();
+    const user_viewer: Prisma.UserUncheckedCreateInput = {
+      id: user_viewer_id,
+      email: faker.internet.email(),
+      user_role_id: roles[1].id,
+    };
+
 
     // Create organization manager
     const organization_manager: Prisma.OrganizationManagerUncheckedCreateInput =
@@ -39,7 +59,7 @@ async function main() {
       slug: 'event-from-' + organization_name,
     };
 
-    return { organization, user, organization_manager, event };
+    return { organization, user, organization_manager, event, user_viewer };
   });
 
   await prisma.$transaction([
@@ -47,9 +67,12 @@ async function main() {
     prisma.organizationManager.deleteMany(),
     prisma.event.deleteMany(),
     prisma.organization.deleteMany(),
+    prisma.userRole.deleteMany(),
     prisma.user.deleteMany(),
     prisma.organization.createMany({ data: data.map(d => d.organization) }),
+    prisma.userRole.createMany({ data: roles}),
     prisma.user.createMany({ data: data.flatMap(d => d.user) }),
+    prisma.user.createMany({ data: data.flatMap(d => d.user_viewer) }),
     prisma.organizationManager.createMany({
       data: data.flatMap(d => d.organization_manager),
     }),
