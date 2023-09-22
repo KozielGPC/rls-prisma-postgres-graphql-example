@@ -1,7 +1,7 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient({
-  //   log: ['query', 'info', 'warn', 'error'],
+  log: ['query', 'info', 'warn', 'error'],
 });
 
 const superPrisma = new PrismaClient({
@@ -29,16 +29,18 @@ export class Main {
     );
   }
 
-  forOrganizationManager(organization_id: string) {
+  forOrganizationManager(organization_id: string, user_role: string) {
     return Prisma.defineExtension(prisma =>
       prisma.$extends({
         query: {
           $allModels: {
             async $allOperations({ args, query }) {
               const [, result] = await prisma.$transaction([
-                prisma.$executeRaw`SELECT set_config('app.current_organization_id', ${organization_id}, TRUE)`,
+                prisma.$executeRaw`SELECT set_config('app.current_organization_id', ${organization_id}, TRUE), set_config('app.current_user_permission_id', ${user_role}, TRUE)`,
+                // prisma.$executeRaw`SELECT set_config('app.current_user_permission_id', ${user_role}, TRUE)`,
                 query(args),
               ]);
+
               return result;
             },
           },
@@ -52,7 +54,7 @@ export class Main {
       await this.bypassPrisma.organization.findFirstOrThrow();
 
     const organizationPrisma = prisma.$extends(
-      this.forOrganizationManager(organization.id)
+      this.forOrganizationManager(organization.id, 'VIEWER')
     );
 
     const organization_manager =
@@ -81,7 +83,10 @@ export class Main {
       });
 
     const organizationPrisma = prisma.$extends(
-      this.forOrganizationManager(organization_manager.organization_id)
+      this.forOrganizationManager(
+        organization_manager.organization_id,
+        'ASDASD'
+      )
     );
 
     const organization_to_be_updated =
@@ -94,7 +99,8 @@ export class Main {
           },
         },
       });
-    return organizationPrisma.organization.update({
+
+    const a = await organizationPrisma.organization.update({
       where: {
         id: organization_to_be_updated.id,
       },
@@ -102,6 +108,10 @@ export class Main {
         description: 'New Description',
       },
     });
+
+    console.log(a);
+
+    return a;
   }
 
   async allowUpdateOrganizationThatIsNotManager() {
@@ -117,7 +127,10 @@ export class Main {
       });
 
     const organizationPrisma = prisma.$extends(
-      this.forOrganizationManager(organization_manager.organization_id)
+      this.forOrganizationManager(
+        organization_manager.organization_id,
+        'VIEWER'
+      )
     );
 
     return organizationPrisma.organization.update({
@@ -143,7 +156,10 @@ export class Main {
       });
 
     const organizationPrisma = prisma.$extends(
-      this.forOrganizationManager(organization_manager.organization_id)
+      this.forOrganizationManager(
+        organization_manager.organization_id,
+        'VIEWER'
+      )
     );
 
     const event = await this.bypassPrisma.event.findFirstOrThrow({
@@ -179,7 +195,10 @@ export class Main {
       });
 
     const organizationPrisma = prisma.$extends(
-      this.forOrganizationManager(organization_manager.organization_id)
+      this.forOrganizationManager(
+        organization_manager.organization_id,
+        'VIEWER'
+      )
     );
 
     const event = await this.bypassPrisma.event.findFirstOrThrow({
