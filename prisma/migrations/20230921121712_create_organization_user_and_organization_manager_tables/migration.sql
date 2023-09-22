@@ -11,7 +11,7 @@ CREATE TABLE "organizations" (
 -- CreateTable
 CREATE TABLE "organization_managers" (
     "reference_user_id" UUID NOT NULL,
-    "organization_id" UUID NOT NULL DEFAULT (current_setting('app.current_company_id'::text))::uuid,
+    "organization_id" UUID NOT NULL DEFAULT (current_setting('app.current_organization_id'::text))::uuid,
 
     CONSTRAINT "organization_managers_pkey" PRIMARY KEY ("reference_user_id","organization_id")
 );
