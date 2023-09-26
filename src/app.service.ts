@@ -1,58 +1,17 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Injectable } from '@nestjs/common';
+import {
+  bypassPrisma,
+  forOrganizationManager,
+  prisma,
+} from '../prisma/prisma-service';
 
-const prisma = new PrismaClient({
-  //   log: ['query', 'info', 'warn', 'error'],
-});
-
-const superPrisma = new PrismaClient({
-  //   log: ['query', 'info', 'warn', 'error'],
-});
-
-export class Main {
-  bypassPrisma = superPrisma.$extends(this.bypassRLS());
-
-  bypassRLS() {
-    return Prisma.defineExtension(prisma =>
-      prisma.$extends({
-        query: {
-          $allModels: {
-            async $allOperations({ args, query }) {
-              const [, result] = await prisma.$transaction([
-                prisma.$executeRaw`SELECT set_config('app.bypass_rls', 'on', TRUE)`,
-                query(args),
-              ]);
-              return result;
-            },
-          },
-        },
-      })
-    );
-  }
-
-  forOrganizationManager(organization_id: string) {
-    return Prisma.defineExtension(prisma =>
-      prisma.$extends({
-        query: {
-          $allModels: {
-            async $allOperations({ args, query }) {
-              const [, result] = await prisma.$transaction([
-                prisma.$executeRaw`SELECT set_config('app.current_organization_id', ${organization_id}, TRUE)`,
-                query(args),
-              ]);
-              return result;
-            },
-          },
-        },
-      })
-    );
-  }
-
+@Injectable()
+export class AppService {
   async returnManagerFromOneOrganization() {
-    const organization =
-      await this.bypassPrisma.organization.findFirstOrThrow();
+    const organization = await bypassPrisma.organization.findFirstOrThrow();
 
     const organizationPrisma = prisma.$extends(
-      this.forOrganizationManager(organization.id)
+      forOrganizationManager(organization.id),
     );
 
     const organization_manager =
@@ -63,16 +22,16 @@ export class Main {
 
   async returnManagerFromManyOrganizations() {
     const organization_managers =
-      await this.bypassPrisma.organizationManager.findMany();
+      await bypassPrisma.organizationManager.findMany();
 
     return organization_managers;
   }
 
   async denyUpdateOrganizationThatIsNotManager() {
-    const user = await this.bypassPrisma.user.findFirstOrThrow();
+    const user = await bypassPrisma.user.findFirstOrThrow();
 
     const organization_manager =
-      await this.bypassPrisma.organizationManager.findFirstOrThrow({
+      await bypassPrisma.organizationManager.findFirstOrThrow({
         where: {
           reference_user_id: {
             equals: user.id,
@@ -81,11 +40,11 @@ export class Main {
       });
 
     const organizationPrisma = prisma.$extends(
-      this.forOrganizationManager(organization_manager.organization_id)
+      forOrganizationManager(organization_manager.organization_id),
     );
 
     const organization_to_be_updated =
-      await this.bypassPrisma.organization.findFirstOrThrow({
+      await bypassPrisma.organization.findFirstOrThrow({
         where: {
           id: {
             not: {
@@ -105,10 +64,10 @@ export class Main {
   }
 
   async allowUpdateOrganizationThatIsNotManager() {
-    const user = await this.bypassPrisma.user.findFirstOrThrow();
+    const user = await bypassPrisma.user.findFirstOrThrow();
 
     const organization_manager =
-      await this.bypassPrisma.organizationManager.findFirstOrThrow({
+      await bypassPrisma.organizationManager.findFirstOrThrow({
         where: {
           reference_user_id: {
             equals: user.id,
@@ -117,7 +76,7 @@ export class Main {
       });
 
     const organizationPrisma = prisma.$extends(
-      this.forOrganizationManager(organization_manager.organization_id)
+      forOrganizationManager(organization_manager.organization_id),
     );
 
     return organizationPrisma.organization.update({
@@ -131,10 +90,10 @@ export class Main {
   }
 
   async denyUpdateEventFromOrganizationThatIsNotManager() {
-    const user = await this.bypassPrisma.organization.findFirstOrThrow();
+    const user = await bypassPrisma.organization.findFirstOrThrow();
 
     const organization_manager =
-      await this.bypassPrisma.organizationManager.findFirstOrThrow({
+      await bypassPrisma.organizationManager.findFirstOrThrow({
         where: {
           reference_user_id: {
             equals: user.id,
@@ -143,10 +102,10 @@ export class Main {
       });
 
     const organizationPrisma = prisma.$extends(
-      this.forOrganizationManager(organization_manager.organization_id)
+      forOrganizationManager(organization_manager.organization_id),
     );
 
-    const event = await this.bypassPrisma.event.findFirstOrThrow({
+    const event = await bypassPrisma.event.findFirstOrThrow({
       where: {
         organization_id: {
           not: {
@@ -167,10 +126,10 @@ export class Main {
   }
 
   async allowUpdateEventFromOrganizationThatIsNotManager() {
-    const user = await this.bypassPrisma.user.findFirstOrThrow();
+    const user = await bypassPrisma.user.findFirstOrThrow();
 
     const organization_manager =
-      await this.bypassPrisma.organizationManager.findFirstOrThrow({
+      await bypassPrisma.organizationManager.findFirstOrThrow({
         where: {
           reference_user_id: {
             equals: user.id,
@@ -179,10 +138,10 @@ export class Main {
       });
 
     const organizationPrisma = prisma.$extends(
-      this.forOrganizationManager(organization_manager.organization_id)
+      forOrganizationManager(organization_manager.organization_id),
     );
 
-    const event = await this.bypassPrisma.event.findFirstOrThrow({
+    const event = await bypassPrisma.event.findFirstOrThrow({
       where: {
         organization_id: organization_manager.organization_id,
       },

@@ -1,7 +1,7 @@
-import { Main } from './main';
+import { AppService } from '../src/app.service';
 
 describe('Tests', () => {
-  let main = new Main();
+  const main = new AppService();
   it('should return one organization manager', async () => {
     const organiazation_manager = await main.returnManagerFromOneOrganization();
 
@@ -17,23 +17,28 @@ describe('Tests', () => {
 
   it('should throw error to update organization description due to user is not manager', async () => {
     await expect(
-      main.denyUpdateOrganizationThatIsNotManager()
+      main.denyUpdateOrganizationThatIsNotManager(),
     ).rejects.toThrow();
   });
 
   it('should allow to update organization description due to user is manager', async () => {
-    const updated_organization = await main.allowUpdateOrganizationThatIsNotManager();
-    expect(updated_organization).toHaveProperty('description', 'New Description');
+    const updated_organization =
+      await main.allowUpdateOrganizationThatIsNotManager();
+    expect(updated_organization).toHaveProperty(
+      'description',
+      'New Description',
+    );
   });
 
   it('should throw error to update event from organization that user is not manager', async () => {
     await expect(
-      main.denyUpdateEventFromOrganizationThatIsNotManager()
+      main.denyUpdateEventFromOrganizationThatIsNotManager(),
     ).rejects.toThrow();
   });
 
   it('should allow to update event that user is manager', async () => {
-    const updated_event = await main.allowUpdateEventFromOrganizationThatIsNotManager();
+    const updated_event =
+      await main.allowUpdateEventFromOrganizationThatIsNotManager();
     expect(updated_event).toHaveProperty('published', false);
   });
 });
