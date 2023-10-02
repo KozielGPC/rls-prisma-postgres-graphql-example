@@ -5,7 +5,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { DirectiveLocation, GraphQLDirective, GraphQLEnumType } from 'graphql';
-import { authDirectiveTransformer } from './auth-directive2';
+import { authDirectiveTransformer } from './auth-directive';
 
 @Module({
   imports: [
@@ -17,7 +17,6 @@ import { authDirectiveTransformer } from './auth-directive2';
           ? join(process.cwd(), 'src/schema.gql')
           : true,
       transformSchema: (schema) => authDirectiveTransformer(schema),
-      // transformSchema: (schema) => authDirectiveTransformer(schema, 'upper'),
       buildSchemaOptions: {
         directives: [
           new GraphQLDirective({
