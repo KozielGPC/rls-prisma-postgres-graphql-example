@@ -1,0 +1,45 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+directive @auth(requires: ROLES) on OBJECT | FIELD_DEFINITION
+
+type OrganizationManager {
+  reference_user_id: String!
+  organization_id: String!
+  organization: Organization!
+}
+
+type OrganizationCount {
+  organization_managers: Int!
+  events: Int!
+}
+
+type Organization {
+  id: ID!
+  name: String!
+  short_name: String
+  description: String
+  organization_managers: [OrganizationManager!]
+  events: [Event!]
+  _count: OrganizationCount!
+}
+
+type Event {
+  id: ID!
+  name: String!
+  slug: String
+  published: Boolean!
+  description: String
+  organization_id: String!
+  organizer: Organization!
+}
+
+type Query {
+  getEvents: [Event!]!
+}
+
+enum ROLES {
+  ADMIN
+  USER
+}

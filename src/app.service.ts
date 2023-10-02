@@ -90,8 +90,7 @@ export class AppService {
   }
 
   async denyUpdateEventFromOrganizationThatIsNotManager() {
-    const user = await bypassPrisma.organization.findFirstOrThrow();
-
+    const user = await bypassPrisma.user.findFirstOrThrow();
     const organization_manager =
       await bypassPrisma.organizationManager.findFirstOrThrow({
         where: {
@@ -115,7 +114,7 @@ export class AppService {
       },
     });
 
-    return organizationPrisma.event.update({
+    const eventupdate = await organizationPrisma.event.update({
       where: {
         id: event.id,
       },
@@ -123,6 +122,8 @@ export class AppService {
         published: false,
       },
     });
+
+    return eventupdate;
   }
 
   async allowUpdateEventFromOrganizationThatIsNotManager() {
@@ -155,5 +156,9 @@ export class AppService {
         published: false,
       },
     });
+  }
+
+  async returnEvents() {
+    return prisma.event.findMany();
   }
 }

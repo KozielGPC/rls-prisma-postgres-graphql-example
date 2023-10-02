@@ -10,6 +10,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+generator nestgraphql {
+  provider                        = "node node_modules/prisma-nestjs-graphql"
+  output                          = "@generated"
+  noAtomicOperations              = true
+  fields_Validator_input          = "true"
+  fields_Validator_from           = "class-validator"
+  fields_BrazilianValidator_input = "true"
+  fields_BrazilianValidator_from  = "brazilian-class-validator"
+  fields_Transformer_model        = "true"
+  fields_Transformer_from         = "class-transformer"
+  fields_Scalars_from             = "graphql-scalars"
+  fields_Scalars_input            = true
+  fields_Scalars_output           = true
+  graphqlScalars_BigInt_name      = "GraphQLBigInt"
+  graphqlScalars_BigInt_specifier = "graphql-scalars"
+  fields_NG_from                  = "@nestjs/graphql"
+  fields_NG_output                = false
+  fields_NG_input                = true
+  fields_NG_model                 = true
+}
+
 model Organization {
   id                    String                @id @default(uuid()) @db.Uuid
   name                  String                @db.VarChar(255)
@@ -37,11 +58,16 @@ model User {
   @@map("users")
 }
 
+/// @NG.Directive('@auth(requires: USER)')
 model Event {
   id              String       @id @default(uuid()) @db.Uuid
+
+  /// @NG.Directive('@upper')
   name            String       @db.VarChar(255)
   slug            String?      @db.VarChar(100)
   published       Boolean      @default(true)
+
+  /// @NG.Directive('@auth(requires: USER)')
   description     String?      @db.Text
   organization_id String       @default(dbgenerated("(current_setting('app.current_organization_id'::text))::uuid")) @db.Uuid
   organizer       Organization @relation(fields: [organization_id], references: [id])
