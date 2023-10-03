@@ -27,7 +27,7 @@ generator nestgraphql {
   graphqlScalars_BigInt_specifier = "graphql-scalars"
   fields_NG_from                  = "@nestjs/graphql"
   fields_NG_output                = false
-  fields_NG_input                = true
+  fields_NG_input                 = true
   fields_NG_model                 = true
 }
 
@@ -61,12 +61,10 @@ model User {
 /// @NG.Directive('@auth(requires: USER)')
 model Event {
   id              String       @id @default(uuid()) @db.Uuid
-
   /// @NG.Directive('@upper')
   name            String       @db.VarChar(255)
   slug            String?      @db.VarChar(100)
   published       Boolean      @default(true)
-
   /// @NG.Directive('@auth(requires: USER)')
   description     String?      @db.Text
   organization_id String       @default(dbgenerated("(current_setting('app.current_organization_id'::text))::uuid")) @db.Uuid

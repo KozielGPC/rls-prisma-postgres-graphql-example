@@ -6,6 +6,8 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { DirectiveLocation, GraphQLDirective, GraphQLEnumType } from 'graphql';
 import { authDirectiveTransformer } from './auth-directive';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './user.guard';
 
 @Module({
   imports: [
@@ -41,6 +43,13 @@ import { authDirectiveTransformer } from './auth-directive';
       },
     }),
   ],
-  providers: [AppService, AppController],
+  providers: [
+    AppService,
+    AppController,
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}
