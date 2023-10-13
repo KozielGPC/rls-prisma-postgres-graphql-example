@@ -48,13 +48,13 @@ async function main() {
     prisma.event.deleteMany(),
     prisma.organization.deleteMany(),
     prisma.user.deleteMany(),
-    prisma.organization.createMany({ data: data.map(d => d.organization) }),
-    prisma.user.createMany({ data: data.flatMap(d => d.user) }),
+    prisma.organization.createMany({ data: data.map((d) => d.organization) }),
+    prisma.user.createMany({ data: data.flatMap((d) => d.user) }),
     prisma.organizationManager.createMany({
-      data: data.flatMap(d => d.organization_manager),
+      data: data.flatMap((d) => d.organization_manager),
     }),
     prisma.event.createMany({
-      data: data.flatMap(d => d.event),
+      data: data.flatMap((d) => d.event),
     }),
   ]);
 
@@ -65,7 +65,7 @@ main()
   .then(async () => {
     await prisma.$disconnect();
   })
-  .catch(async e => {
+  .catch(async (e) => {
     console.error(e);
     await prisma.$disconnect();
     process.exit(1);
