@@ -95,7 +95,17 @@ Run the following command to add seed data to the database:
 yarn prisma db seed
 ```
 
-### 5. Run the `test` script
+### 5. Run application
+
+To run the application you should run the following command:
+
+```sh
+yarn start:dev
+```
+
+Then you can access it at `http://localhost:3000/graphql`
+
+### 6. Run the `test` script
 
 To run the `tests.spec.ts` file, run the following command:
 
