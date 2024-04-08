@@ -2,7 +2,10 @@
 
 ## About
 
-This project is destinated to study the RLS (Row Level Security) with Prisma and PostgreSQL, using `Prisma Extensions`.
+This project is destinated to study the RLS (Row Level Security) with 3 implementations:
+- Prisma and PostgreSQL, using `Prisma Extensions`.
+- GraphQL directives.
+- Nest.JS Guards
 
 ## Tables and policies
 
@@ -42,8 +45,8 @@ This project is destinated to study the RLS (Row Level Security) with Prisma and
 
 ### Policies
 
-- User only is allowed to update, read or delete an Organization if he is OrganizationManager from that Organization
-- User only is allowed to create, update, read or delete an Event if he is OrganizationManager from the Organization that is organizer from that Event
+- User is only allowed to update, read or delete an Organization if he is OrganizationManager from that Organization
+- User is only allowed to create, update, read or delete an Event if he is OrganizationManager from the Organization that is organizer from that Event
 
 ## How to Use
 
