@@ -159,6 +159,15 @@ export class AppService {
   }
 
   async returnEvents() {
-    return prisma.event.findMany();
+    return prisma.event.findMany({
+      include: {
+        organizer: {
+          include: {
+            events: true,
+            organization_managers: true,
+          },
+        },
+      },
+    });
   }
 }
