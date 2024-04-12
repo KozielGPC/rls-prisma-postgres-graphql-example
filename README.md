@@ -1,4 +1,4 @@
-# RLS With Prisma and PostgreSQL
+# RLS With Prisma, PostgreSQL and GraphQL
 
 ## About
 
