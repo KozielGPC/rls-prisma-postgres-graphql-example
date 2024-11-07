@@ -6,6 +6,9 @@
   "author": "Marcio Gabriel <gpcgabriel0@gmail.com>",
   "private": true,
   "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18.15"
+  },
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",

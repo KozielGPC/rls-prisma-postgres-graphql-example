@@ -1,7 +1,7 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 
 export const prisma = new PrismaClient({
-  log: ['query', 'info', 'warn', 'error'],
+  // log: ['query', 'info', 'warn', 'error'],
 });
 
 const superPrisma = new PrismaClient({
@@ -33,11 +33,14 @@ export function forOrganizationManager(organization_id: string) {
     prisma.$extends({
       query: {
         $allModels: {
-          async $allOperations({ args, query }) {
+          async $allOperations({ args, query }) {     
+            console.log('organization_id: ', organization_id);
+                   
             const [, result] = await prisma.$transaction([
               prisma.$executeRaw`SELECT set_config('app.current_organization_id', ${organization_id}, TRUE)`,
               query(args),
             ]);
+            
             return result;
           },
         },

@@ -170,4 +170,21 @@ export class AppService {
       },
     });
   }
+
+  async returnEventsForOrganizationManager(organization_id: string) {
+    const organizationPrisma = prisma.$extends(
+      forOrganizationManager(organization_id),
+    );
+
+    return organizationPrisma.event.findMany({
+      include: {
+        organizer: {
+          include: {
+            events: true,
+            organization_managers: true,
+          },
+        },
+      },
+    });
+  }
 }
